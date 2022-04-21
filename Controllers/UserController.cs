@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using swen_capstone_project.Data;
+using swen_capstone_project.Models;
 
 namespace swen_capstone_project.Controllers;
 
@@ -8,28 +10,68 @@ namespace swen_capstone_project.Controllers;
 
 public class UserController : Controller
 {
-    private static readonly string[] Summaries = new[]
-    {
-        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-    };
     private readonly IConfiguration _configuration;
     private readonly ILogger<UserController> _logger;
+    private readonly CapstoneProjectContext _context;
 
-    public UserController(ILogger<UserController> logger, IConfiguration configuration)
+    public UserController(ILogger<UserController> logger, IConfiguration configuration, CapstoneProjectContext context)
     {
         _logger = logger;
         _configuration = configuration;
+        _context = context;
     }
 
     [HttpGet]
-    public IEnumerable<WeatherForecast> Get()
+    [Route("{id}")]
+    public ActionResult Get(int id)
     {
-        return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+        var user = _context.Users.FirstOrDefault(u => u.Id == id);
+        if (user == null)
         {
-            Date = DateTime.Now.AddDays(index),
-            TemperatureC = Random.Shared.Next(-20, 55),
-            Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-        })
-        .ToArray();
+            return NotFound();
+        }
+
+        return Ok(user);
+    }
+
+    [HttpPost]
+    public ActionResult CreateUser([FromBody]User user)
+    {
+        return Ok(_context.Users.Add(user));
+    }
+
+    [HttpPut]
+    public ActionResult UpdateUser([FromBody] User user)
+    {
+        var userToUpdate = _context.Users.FirstOrDefault(u => u.Id == user.Id);
+        if (userToUpdate == null)
+        {
+            return NotFound();
+        }
+
+        userToUpdate.Name = user.Name;
+        userToUpdate.Username = user.Username;
+        _context.SaveChanges();
+        return Ok(userToUpdate);
+    }
+
+    [HttpPut]
+    [Route("assign/{id}")]
+    public ActionResult AddAssignmentToStudent(int id, [FromBody] Assignment assignment)
+    {
+        if (assignment == null)
+        {
+            return BadRequest();
+        }
+
+        var user = _context.Users.FirstOrDefault(u => u.Id == id);
+        if(user == null)
+        {
+            return NotFound();
+        }
+
+        user.Assignments.Add(assignment);
+        _context.SaveChanges();
+        return Ok();
     }
 }

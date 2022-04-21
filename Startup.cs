@@ -1,3 +1,5 @@
+using swen_capstone_project.Data;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -44,6 +46,9 @@ namespace swen_capstone_project
                 {
                     configuration.RootPath = "ClientApp/dist";
                 });
+
+            services.AddDbContext<CapstoneProjectContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

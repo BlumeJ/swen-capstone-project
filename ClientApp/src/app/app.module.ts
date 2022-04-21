@@ -9,6 +9,7 @@ import { LoginComponent } from './login/login';
 import { TeacherViewComponent } from './teacher-view/teacher-view.component';
 import { AssignmentViewComponent } from './assignment/assignment.component';
 import { StudentViewComponent } from './student-view/student-view.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import { StudentViewComponent } from './student-view/student-view.component';
       { path: 'teacher', component: TeacherViewComponent },
       { path: 'assignment', component: AssignmentViewComponent },
       { path: 'student', component: StudentViewComponent},
-    ])
+    ]),
+    BrowserAnimationsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
